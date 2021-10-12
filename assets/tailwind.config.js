@@ -5,6 +5,12 @@ module.exports = {
     '../lib/*_web/**/*.*ex'
   ],
   theme: {
+    fontFamily: {
+      "branding": ["Krona One"],
+      "username": ["Special Elite"],
+      "nodename": ["Maven Pro"],
+      "price": ["Aclonica"]
+    },
   },
   variants: {
     extend: {},

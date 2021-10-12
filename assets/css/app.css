@@ -1,8 +1,8 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import url('https://fonts.googleapis.com/css2?family=Galindo&family=Aclonica&family=Ubuntu+Mono&family=Krona+One&family=Special+Elite&family=Maven+Pro:wght@500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import "./my.css";

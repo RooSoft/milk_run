@@ -79,16 +79,6 @@ defmodule MilkRun.BitfinexClient do
     }
   end
 
-  # defp print %{ status: :ok } = data do
-  #   IO.puts data.price
-
-  #   socket
-  #   |> broadcast(@bitfinex_topic, @btcusd_message)
-  # end
-
-  # defp print %{ status: :nothing } do
-  # end
-
   defp maybe_broadcast %{ status: :ok } = data, topic, message do
     Endpoint.broadcast(topic, message, data.price)
 

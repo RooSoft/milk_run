@@ -1,6 +1,8 @@
 defmodule MilkRunWeb.Live.IndexLive do
   use Phoenix.LiveView
 
+  require Logger
+
   alias MilkRunWeb.Endpoint
 
   @bitfinex_topic "bitfinex"
@@ -14,13 +16,22 @@ defmodule MilkRunWeb.Live.IndexLive do
   end
 
   @impl true
-  def handle_info(%{ topic: @bitfinex_topic, event: @btcusd_message, payload: value }, socket) do
-    IO.inspect value
+  def handle_info(%{ topic: @bitfinex_topic, event: @btcusd_message, payload: value }, socket) when is_float(value) do
+    Logger.warning("Got a float #{value}")
 
-    socket = socket
-      |> update_socket(value)
+    formatted_value = :erlang.float_to_binary(value, [decimals: 0])
+    { int_value, _ } = Integer.parse(formatted_value)
 
-    { :noreply, socket }
+    { :noreply, socket
+      |> update_socket(int_value) }
+  end
+
+  @impl true
+  def handle_info(%{ topic: @bitfinex_topic, event: @btcusd_message, payload: value }, socket) when is_integer(value) do
+    Logger.warning("Got an integer #{value}")
+
+    { :noreply, socket
+      |> update_socket(value) }
   end
 
   def init_value(socket) do
