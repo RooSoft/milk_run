@@ -17,6 +17,7 @@ defmodule MilkRun.Application do
       # Start a worker by calling: MilkRun.Worker.start_link(arg)
       # {MilkRun.Worker, arg}
 
+      MilkRun.Cache,
       MilkRun.BitfinexClient
     ]
 

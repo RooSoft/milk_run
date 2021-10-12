@@ -11,7 +11,7 @@ defmodule MilkRunWeb.Live.IndexLive do
   @impl true
   def mount(_params, _, socket) do
     {:ok, socket
-      |> init_value
+      |> get_current_value
       |> subscribe_to_events()}
   end
 
@@ -34,9 +34,9 @@ defmodule MilkRunWeb.Live.IndexLive do
       |> update_socket(value) }
   end
 
-  def init_value(socket) do
+  def get_current_value(socket) do
     socket
-    |> assign(:value, "N/D")
+    |> assign(:value, MilkRun.Cache.get_btcusd)
   end
 
   defp subscribe_to_events(socket) do

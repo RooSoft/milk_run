@@ -2,6 +2,7 @@ defmodule MilkRun.BitfinexClient do
   use WebSockex
   require Logger
 
+  alias MilkRun.Cache
   alias MilkRunWeb.Endpoint
 
   @stream_endpoint "wss://api.bitfinex.com/ws/1"
@@ -79,7 +80,15 @@ defmodule MilkRun.BitfinexClient do
     }
   end
 
-  defp maybe_broadcast %{ status: :ok } = data, topic, message do
+  defp maybe_broadcast(%{ status: :ok } = data, topic, message) when is_float(data.price) do
+    formatted_price = :erlang.float_to_binary(data.price, [decimals: 0])
+    { int_price, _ } = Integer.parse(formatted_price)
+
+    maybe_broadcast(int_price, topic, message)
+  end
+
+  defp maybe_broadcast(%{ status: :ok } = data, topic, message) when is_integer(data.price) do
+    Cache.set_btcusd(data.price)
     Endpoint.broadcast(topic, message, data.price)
 
     data
