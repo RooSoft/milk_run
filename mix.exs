@@ -46,7 +46,8 @@ defmodule MilkRun.MixProject do
       {:gettext, "~> 0.18"},
       {:phx_gen_tailwind, "~> 0.1.3", only: :dev},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:websockex, "~> 0.4.3"}
     ]
   end
 

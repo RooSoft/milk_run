@@ -13,9 +13,11 @@ defmodule MilkRun.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: MilkRun.PubSub},
       # Start the Endpoint (http/https)
-      MilkRunWeb.Endpoint
+      MilkRunWeb.Endpoint,
       # Start a worker by calling: MilkRun.Worker.start_link(arg)
       # {MilkRun.Worker, arg}
+
+      MilkRun.BitfinexClient
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
