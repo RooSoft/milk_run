@@ -70,12 +70,9 @@ defmodule MilkRun.Clients.Kraken do
   end
 
   defp process([_channel_id, trades, "trade", "XBT/CAD"]) when is_list(trades) do
-    [price_string, volume_string, _time, _side, _order_type, _misc] = trades |> List.last
+    [price_string, _volume_string, _time, _side, _order_type, _misc] = trades |> List.last
 
     {price, _} = price_string |> Float.parse
-    {volume, _} = volume_string |> Float.parse
-
-    Logger.info "New BTC/CAD price of #{price}. #{volume} coins has been traded."
 
     price |> broadcast(@kraken_topic, @btccad_message)
   end
