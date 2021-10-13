@@ -6,16 +6,24 @@ defmodule MilkRun.Cache do
   end
 
   @impl true
-  def init(stack) do
-    {:ok, stack}
+  def init(state) do
+    {:ok, state |> Map.put(:btcusd, 0)}
   end
 
   def get_btcusd() do
     GenServer.call(__MODULE__, {:get_btcusd})
   end
 
+  def get_btccad() do
+    GenServer.call(__MODULE__, {:get_btccad})
+  end
+
   def set_btcusd(value) do
     GenServer.cast(__MODULE__, {:set_btcusd, value})
+  end
+
+  def set_btccad(value) do
+    GenServer.cast(__MODULE__, {:set_btccad, value})
   end
 
   @impl true
@@ -27,7 +35,20 @@ defmodule MilkRun.Cache do
   end
 
   @impl true
+  def handle_cast({:set_btccad, value}, state) do
+    {
+      :noreply,
+      state |> Map.put(:btccad, value)
+    }
+  end
+
+  @impl true
   def handle_call({:get_btcusd},  _from, state) do
     { :reply, state.btcusd, state }
+  end
+
+  @impl true
+  def handle_call({:get_btccad},  _from, state) do
+    { :reply, state.btccad, state }
   end
 end
