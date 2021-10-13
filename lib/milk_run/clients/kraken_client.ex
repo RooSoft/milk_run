@@ -11,40 +11,32 @@ defmodule MilkRun.Clients.Kraken do
   @btccad_message "btccad"
 
 
-  def start_link(_) do
-    { :ok, pid } =  WebSockex.start_link(
+  def start() do
+    WebSockex.start(
       @stream_endpoint,
       __MODULE__,
       %{})
-
-    Logger.warning "#{inspect pid}"
-
-    { :ok, pid }
+    |> manage_connection
   end
 
-
   def handle_connect(_conn, state) do
-    Logger.warning "Connected to kraken..."
+    Logger.info "Connected to kraken..."
 
-    subscription = %{
+    subscription = Jason.encode!(%{
       event: "subscribe",
       pair: ["BTC/CAD"],
       subscription: %{
         name: "trade"
       }
-    }
+    })
 
-    subscription_json = Jason.encode!(subscription)
-
-    WebSockex.cast(self(), {:send_message, subscription_json})
+    WebSockex.cast(self(), {:send_message, subscription})
 
     { :ok, state }
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.warning "Subscribing..."
-
-    IO.inspect subscription_json
+    Logger.info "Subscribing to Kraken..."
 
     {:reply, { :text, subscription_json }, state}
   end
@@ -57,8 +49,21 @@ defmodule MilkRun.Clients.Kraken do
     {:ok, state}
   end
 
+  defp manage_connection { :ok, pid } do
+    { :ok, pid }
+  end
+
+  defp manage_connection { :error, %WebSockex.RequestError{code: 503} } do
+    { :error, 1, "Kraken is down"}
+  end
+
+  defp manage_connection { :error, error } do
+    { :error, 255, "Kraken unknown error"}
+    IO.inspect error
+  end
+
   defp process %{ "event" => "heartbeat" } do
-    IO.puts "Heartbeat"
+     # nothing to do here, heatbeats usually being sent every second or so
   end
 
   defp process([_channel_id, trades, "trade", "XBT/CAD"]) when is_list(trades) do
@@ -67,14 +72,22 @@ defmodule MilkRun.Clients.Kraken do
     {price, _} = price_string |> Float.parse
     {volume, _} = volume_string |> Float.parse
 
-    IO.puts "New BTC/CAD price of #{price}. #{volume} coins has been traded."
+    Logger.info "New BTC/CAD price of #{price}. #{volume} coins has been traded."
 
     price |> broadcast(@kraken_topic, @btccad_message)
   end
 
+  defp process %{ "channelName" => "trade", "pair" => "XBT/CAD", "status" => "subscribed", "subscription" => %{"name" => "trade"} } do
+    Logger.info "Successfully connected to Kraken XBT/CAD trades websocket"
+  end
+
+  defp process %{"connectionID" => _connection_id, "event" => "systemStatus", "status" => "online", "version" => _version} do
+    Logger.info "Kraken is online"
+  end
+
   defp process message do
-    IO.puts "Unknown packet"
-    IO.inspect message
+    Logger.warning "Unknown packet"
+    Logger.warning inspect message
   end
 
   defp broadcast(price, topic, message) do

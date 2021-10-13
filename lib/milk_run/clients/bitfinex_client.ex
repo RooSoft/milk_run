@@ -11,17 +11,13 @@ defmodule MilkRun.Clients.Bitfinex do
   @btcusd_message "btcusd"
 
 
-  def start_link(symbol) do
-    { :ok, pid } =  WebSockex.start_link(
+  def start() do
+    WebSockex.start(
       @stream_endpoint,
       __MODULE__,
-      %{symbol: symbol})
-
-    Logger.warning "#{inspect pid}"
-
-    { :ok, pid }
+      %{})
+    |> manage_connection
   end
-
 
   def handle_connect(_conn, state) do
     Logger.warning "Connected to bitfinex..."
@@ -62,6 +58,23 @@ defmodule MilkRun.Clients.Bitfinex do
     IO.inspect msg
 
     {:ok, state}
+  end
+
+  defp manage_connection { :ok, pid } do
+    { :ok, pid }
+  end
+
+  defp manage_connection { :error, %WebSockex.RequestError{code: 503} } do
+    { :error, 1, "Bitfinex is down"}
+  end
+
+  defp manage_connection {:error, %WebSockex.ConnError{original: :timeout}} do
+    { :error, 2, "Bitfinex timeout"}
+  end
+
+  defp manage_connection { :error, error } do
+    { :error, 255, "Bitfinex unknown error"}
+    IO.inspect error
   end
 
   defp get_price [_channel_id, _bid, _bid_size, _ask, _ask_size, _daily_change, _daily_change_perc, last_price, volume, high, low] do
