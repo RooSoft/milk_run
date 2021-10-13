@@ -36,9 +36,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.warning "Subscribing..."
-
-    IO.inspect subscription_json
+    Logger.warning "Subscribing...\m#{subscription_json}"
 
     {:reply, { :text, subscription_json }, state}
   end
