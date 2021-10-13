@@ -73,8 +73,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   defp manage_connection { :error, error } do
-    { :error, 255, "Bitfinex unknown error"}
-    IO.inspect error
+    { :error, 255, "Bitfinex unknown error \n#{inspect error}"}
   end
 
   defp get_price [_channel_id, _bid, _bid_size, _ask, _ask_size, _daily_change, _daily_change_perc, last_price, volume, high, low] do

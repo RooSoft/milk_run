@@ -62,9 +62,7 @@ defmodule MilkRun.Clients.Kraken do
   end
 
   defp manage_connection { :error, error } do
-    IO.inspect error
-
-    { :error, 255, "Kraken unknown error"}
+    { :error, 255, "Kraken unknown error\n#{inspect error}"}
   end
 
   defp process %{ "event" => "heartbeat" } do
