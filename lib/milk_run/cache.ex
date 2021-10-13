@@ -7,7 +7,10 @@ defmodule MilkRun.Cache do
 
   @impl true
   def init(state) do
-    {:ok, state |> Map.put(:btcusd, 0)}
+    {:ok, state
+      |> Map.put(:btcusd, 0)
+      |> Map.put(:btccad, 0)
+    }
   end
 
   def get_btcusd() do
