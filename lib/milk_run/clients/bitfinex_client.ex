@@ -1,4 +1,4 @@
-defmodule MilkRun.BitfinexClient do
+defmodule MilkRun.Clients.Bitfinex do
   use WebSockex
   require Logger
 

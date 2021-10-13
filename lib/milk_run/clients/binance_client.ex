@@ -1,4 +1,4 @@
-defmodule MilkRun.BinanceClient do
+defmodule MilkRun.Clients.Binance do
   use WebSockex
   require Logger
 

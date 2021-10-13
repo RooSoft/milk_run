@@ -18,7 +18,7 @@ defmodule MilkRun.Application do
       # {MilkRun.Worker, arg}
 
       MilkRun.Cache,
-      MilkRun.BitfinexClient
+      MilkRun.Clients.Bitfinex
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
