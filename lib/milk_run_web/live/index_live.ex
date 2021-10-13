@@ -31,16 +31,12 @@ defmodule MilkRunWeb.Live.IndexLive do
 
   @impl true
   def handle_info(%{ topic: @bitfinex_topic, event: @btcusd_message, payload: value }, socket) when is_integer(value) do
-    Logger.warning("Got a bitfinex integer #{value}")
-
     { :noreply, socket
       |> update_btcusd(value) }
   end
 
   @impl true
   def handle_info(%{ topic: @kraken_topic, event: @btccad_message, payload: value }, socket) when is_float(value) do
-    Logger.warning("Got a kraken float #{value}")
-
     { :noreply, socket
       |> update_btccad(value) }
   end

@@ -20,7 +20,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_connect(_conn, state) do
-    Logger.warning "Connected to bitfinex..."
+    Logger.info "Connected to bitfinex..."
 
     subscription = %{
       event: "subscribe",
@@ -36,7 +36,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.warning "Subscribing...\n#{subscription_json}"
+    Logger.info "Subscribing...\n#{subscription_json}"
 
     {:reply, { :text, subscription_json }, state}
   end
