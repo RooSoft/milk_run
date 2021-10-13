@@ -26,7 +26,6 @@ defmodule MilkRun.ConnectionManager do
   @impl true
   def handle_info({ :DOWN, ref, :process, pid, reason}, state) do
     Logger.warn "#{inspect ref} is down because: #{inspect reason}, subscription #{inspect pid}"
-    IO.inspect state
 
     {
       :noreply,
@@ -50,9 +49,8 @@ defmodule MilkRun.ConnectionManager do
   end
 
   defp ensure_bitfinex_is_connected %{ bitfinex: unknown_status } = state do
-    Logger.warn("Unknown Bitfinex status in connection manager")
+    Logger.warn("Unknown Bitfinex status in connection manager\n#{inspect unknown_status}")
     print_time()
-    IO.inspect unknown_status
 
     state
   end
@@ -78,9 +76,8 @@ defmodule MilkRun.ConnectionManager do
   end
 
   defp ensure_kraken_is_connected %{ kraken: unknown_status } = state do
-    Logger.warn("Unknown Kraken status in connection manager")
+    Logger.warn("Unknown Kraken status in connection manager\n#{inspect unknown_status}}")
     print_time()
-    IO.inspect unknown_status
 
     state
   end
@@ -130,7 +127,7 @@ defmodule MilkRun.ConnectionManager do
   end
 
   defp print_time do
-    IO.inspect DateTime.now!("Etc/UTC")
+    Logger.info("#{DateTime.now!("Etc/UTC")}")
   end
 
   defp set_down %{kraken: {:up, pid}} = state, pid do
