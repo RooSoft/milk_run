@@ -57,9 +57,14 @@ defmodule MilkRun.Clients.Kraken do
     { :error, 1, "Kraken is down"}
   end
 
+  defp manage_connection { :error, %WebSockex.ConnError{original: :econnrefused} } do
+    { :error, 2, "Kraken connection is refused"}
+  end
+
   defp manage_connection { :error, error } do
-    { :error, 255, "Kraken unknown error"}
     IO.inspect error
+
+    { :error, 255, "Kraken unknown error"}
   end
 
   defp process %{ "event" => "heartbeat" } do

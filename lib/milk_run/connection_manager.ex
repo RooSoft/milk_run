@@ -23,6 +23,20 @@ defmodule MilkRun.ConnectionManager do
     |> ensure_kraken_is_connected }
   end
 
+  @impl true
+  def handle_info({ :DOWN, ref, :process, pid, reason}, state) do
+    Logger.warn "#{inspect ref} is down because: #{inspect reason}, subscription #{inspect pid}"
+    IO.inspect state
+
+    {
+      :noreply,
+      state
+      |> set_down(pid)
+      |> ensure_bitfinex_is_connected
+      |> ensure_kraken_is_connected
+    }
+  end
+
   defp ensure_bitfinex_is_connected %{ bitfinex: { :down, _code } } = state do
     Logger.info("Bitfinex is down, reconnecting...")
     print_time()
@@ -52,7 +66,7 @@ defmodule MilkRun.ConnectionManager do
   end
 
   defp ensure_kraken_is_connected %{ kraken: { :down, _code } } = state do
-    Logger.info("Kraken is down, reconnecting...")
+    Logger.warn("Kraken is down, reconnecting...")
     print_time()
 
     MilkRun.Clients.Kraken.start
@@ -86,6 +100,8 @@ defmodule MilkRun.ConnectionManager do
   defp manage_bitfinex_connection { :ok, pid }, state do
     Logger.info "Bitfinex started: #{inspect pid}"
 
+    Process.monitor(pid)
+
     state
     |> Map.put(:bitfinex, { :up, pid })
   end
@@ -100,6 +116,8 @@ defmodule MilkRun.ConnectionManager do
   defp manage_kraken_connection { :ok, pid }, state do
     Logger.info "Kraken started: #{inspect pid}"
 
+    Process.monitor(pid)
+
     state
     |> Map.put(:kraken, { :up, pid })
   end
@@ -113,5 +131,15 @@ defmodule MilkRun.ConnectionManager do
 
   defp print_time do
     IO.inspect DateTime.now!("Etc/UTC")
+  end
+
+  defp set_down %{kraken: {:up, pid}} = state, pid do
+    state
+    |> Map.put(:kraken, {:down, 0})
+  end
+
+  defp set_down %{bitfinex: {:up, pid}} = state, pid do
+    state
+    |> Map.put(:bitfinex, {:down, 0})
   end
 end
