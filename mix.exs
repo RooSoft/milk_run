@@ -10,7 +10,8 @@ defmodule MilkRun.MixProject do
       compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -61,6 +62,16 @@ defmodule MilkRun.MixProject do
     [
       setup: ["deps.get", "cmd --cd assets npm install"],
       "assets.deploy": ["cmd --cd assets npm run deploy", "esbuild default --minify", "phx.digest"]
+    ]
+  end
+
+  defp releases do
+    [
+      milk_run: [
+        steps: [:assemble, :tar],
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent]
+      ]
     ]
   end
 end
