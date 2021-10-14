@@ -1,0 +1,14 @@
+{
+  "name": "MilkRun",
+  "short_name": "MilkRun",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#00ff00",
+  "background_color":"#0000ff",
+  "icons": [
+    {
+      "src": "/images/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }]
+}
