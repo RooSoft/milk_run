@@ -22,8 +22,7 @@ defmodule MilkRunWeb.Live.IndexLive do
   def handle_info(%{ topic: @bitfinex_topic, event: @btcusd_message, payload: value }, socket) when is_float(value) do
     Logger.warning("Got a bitfinex float #{value}")
 
-    formatted_value = :erlang.float_to_binary(value, [decimals: 0])
-    { int_value, _ } = Integer.parse(formatted_value)
+    int_value = convert_float_to_int value
 
     { :noreply, socket
       |> update_btcusd(int_value) }
@@ -37,8 +36,10 @@ defmodule MilkRunWeb.Live.IndexLive do
 
   @impl true
   def handle_info(%{ topic: @kraken_topic, event: @btccad_message, payload: value }, socket) when is_float(value) do
+    int_value = convert_float_to_int value
+
     { :noreply, socket
-      |> update_btccad(value) }
+      |> update_btccad(int_value) }
   end
 
   def get_current_values(socket) do
@@ -54,6 +55,13 @@ defmodule MilkRunWeb.Live.IndexLive do
     end
 
     socket
+  end
+
+  defp convert_float_to_int float_value do
+    formatted_value = :erlang.float_to_binary(float_value, [decimals: 0])
+    { int_value, _ } = Integer.parse(formatted_value)
+
+    int_value
   end
 
   defp update_btcusd socket, value do
