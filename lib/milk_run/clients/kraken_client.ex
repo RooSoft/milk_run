@@ -27,7 +27,6 @@ defmodule MilkRun.Clients.Kraken do
     case HTTPoison.get(@btccad_ticker_url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         parse_current_btccad_price!(body)
-        |> IO.inspect
         |> broadcast(@kraken_topic, @btccad_message)
 
         {:ok}
