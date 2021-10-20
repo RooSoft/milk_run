@@ -2,22 +2,42 @@ defmodule MilkRun.Clients.Kraken do
   use WebSockex
   require Logger
 
-  @stream_endpoint "wss://ws.kraken.com"
-
   alias MilkRun.Cache
   alias MilkRunWeb.Endpoint
+
+  @stream_endpoint "wss://ws.kraken.com"
+
+  @btccad_ticker_url "https://api.kraken.com/0/public/Ticker?pair=XBTCAD"
 
   @kraken_topic "kraken"
   @btccad_message "btccad"
 
 
   def start() do
+    broadcast_current_btccad_price()
+
     WebSockex.start(
       @stream_endpoint,
       __MODULE__,
       %{})
     |> manage_connection
   end
+
+  def broadcast_current_btccad_price() do
+    case HTTPoison.get(@btccad_ticker_url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        parse_current_btccad_price!(body)
+        |> IO.inspect
+        |> broadcast(@kraken_topic, @btccad_message)
+
+        {:ok}
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:error, 404}
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
 
   def handle_connect(_conn, state) do
     Logger.info "Connected to kraken..."
@@ -47,6 +67,19 @@ defmodule MilkRun.Clients.Kraken do
     |> process
 
     {:ok, state}
+  end
+
+
+  defp parse_current_btccad_price! ticker_body do
+    %{
+      "result" => %{
+        "XXBTZCAD" => %{ "c" => [price_string, _volume] }
+      }
+    } = Jason.decode!(ticker_body)
+
+    {price, _} = price_string |> Float.parse
+
+    price
   end
 
   defp manage_connection { :ok, pid } do
