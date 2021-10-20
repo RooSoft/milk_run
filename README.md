@@ -9,6 +9,19 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
+## Production build
+
+```bash
+MIX_ENV=prod mix release
+scp _build/prod/milk_run-0.x.0.tar.gz milkrun@prod-server:.
+```
+
+Then unpack the tarball wherever you like, such as `/opt/milk_run-0.x.0` and run this command
+
+```bash
+/opt/milk_run-0.x.0/bin/milk_run start
+```
+
 ## Learn more
 
   * Official website: https://www.phoenixframework.org/
