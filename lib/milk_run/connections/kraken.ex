@@ -1,4 +1,4 @@
-defmodule MilkRun.Connections.Bitfinex do
+defmodule MilkRun.Connections.Kraken do
   use GenServer
 
   require Logger
@@ -15,7 +15,7 @@ defmodule MilkRun.Connections.Bitfinex do
 
   @impl true
   def init(state) do
-    Logger.info("#{DateTime.now!("Etc/UTC")}: Initializing bitfinex connection", ansi_color: :light_blue)
+    Logger.info("#{DateTime.now!("Etc/UTC")}: Initializing kraken connection", ansi_color: :light_blue)
 
     Process.send(__MODULE__, {:start}, [])
 
@@ -24,7 +24,7 @@ defmodule MilkRun.Connections.Bitfinex do
 
   @impl Connection
   def stop do
-    Logger.info("#{DateTime.now!("Etc/UTC")}: Manually stopping bitfinex connection", ansi_color: :light_blue)
+    Logger.info("#{DateTime.now!("Etc/UTC")}: Manually stopping kraken connection", ansi_color: :light_blue)
 
     GenServer.stop(__MODULE__, :manual)
   end
@@ -36,11 +36,11 @@ defmodule MilkRun.Connections.Bitfinex do
 
   @impl true
   def handle_info({:start}, state) do
-    Logger.info "#{DateTime.now!("Etc/UTC")}: Starting bitfinex connection", ansi_color: :light_blue
+    Logger.info "#{DateTime.now!("Etc/UTC")}: Starting kraken connection", ansi_color: :light_blue
 
     {
       :noreply,
-      MilkRun.Clients.Bitfinex.start
+      MilkRun.Clients.Kraken.start
       |> manage_connection(state)
     }
   end
@@ -48,7 +48,7 @@ defmodule MilkRun.Connections.Bitfinex do
   @impl true
   def handle_info({ :DOWN, ref, :process, pid, reason}, state) do
     Logger.warn "#{inspect pid} #{inspect ref} is down because: #{inspect reason}"
-    Logger.warn "Will restart bitfinex in #{@restart_delay/1000}s"
+    Logger.warn "Will restart kraken in #{@restart_delay/1000}s"
 
     # try to restart the service after a given delay
     Process.send_after(self(), :start, @restart_delay)
@@ -63,7 +63,7 @@ defmodule MilkRun.Connections.Bitfinex do
 
 
   defp manage_connection { :ok, pid }, state do
-    Logger.info "#{DateTime.now!("Etc/UTC")}: Bitfinex started: #{inspect pid}", ansi_color: :light_blue
+    Logger.info "#{DateTime.now!("Etc/UTC")}: Kraken started: #{inspect pid}", ansi_color: :light_blue
 
     Process.monitor(pid)
 
@@ -71,7 +71,7 @@ defmodule MilkRun.Connections.Bitfinex do
   end
 
   defp manage_connection { :error, code, message }, state do
-    Logger.warn "Bitfinex issued an error #{code} on startup : #{message}"
+    Logger.warn "Kraken issued an error #{code} on startup : #{message}"
 
     %{ state | state: :down }
   end
