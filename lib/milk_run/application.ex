@@ -18,7 +18,8 @@ defmodule MilkRun.Application do
       # {MilkRun.Worker, arg}
 
       MilkRun.Cache,
-      MilkRun.ConnectionManager
+   #   MilkRun.ConnectionManager
+      MilkRun.Connections.Bitfinex
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
