@@ -7,11 +7,10 @@ defmodule MilkRun.Clients.Bitfinex do
 
   @stream_endpoint "wss://api.bitfinex.com/ws/1"
 
-  @btccad_ticker_url "https://api-pub.bitfinex.com/v2/ticker/tBTCUSD"
+  @btcusd_ticker_url "https://api-pub.bitfinex.com/v2/ticker/tBTCUSD"
 
   @bitfinex_topic "bitfinex"
   @btcusd_message "btcusd"
-
 
   def start() do
     broadcast_current_btcusd_price()
@@ -19,26 +18,45 @@ defmodule MilkRun.Clients.Bitfinex do
     WebSockex.start(
       @stream_endpoint,
       __MODULE__,
-      %{})
+      %{}
+    )
     |> manage_connection
   end
 
   def broadcast_current_btcusd_price() do
-    case HTTPoison.get(@btccad_ticker_url) do
+    case HTTPoison.get(@btcusd_ticker_url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         parse_current_btcusd_price!(body)
         |> broadcast(@bitfinex_topic, @btcusd_message)
 
         {:ok}
+
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         {:error, 404}
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
+  def broadcast_current_btcusd_trades() do
+    case HTTPoison.get(@btcusd_ticker_url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        parse_current_btcusd_price!(body)
+        |> broadcast(@bitfinex_topic, @btcusd_message)
+
+        {:ok}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:error, 404}
+
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end
   end
 
   def handle_connect(_conn, state) do
-    Logger.info "Connected to bitfinex..."
+    Logger.info("Connected to bitfinex...")
 
     subscription = %{
       event: "subscribe",
@@ -50,13 +68,13 @@ defmodule MilkRun.Clients.Bitfinex do
 
     WebSockex.cast(self(), {:send_message, subscription_json})
 
-    { :ok, state }
+    {:ok, state}
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.info "Subscribing...\n#{subscription_json}"
+    Logger.info("Subscribing...\n#{subscription_json}")
 
-    {:reply, { :text, subscription_json }, state}
+    {:reply, {:text, subscription_json}, state}
   end
 
   def handle_frame({:text, message}, state) do
@@ -68,12 +86,12 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_frame({type, msg}, state) do
-    Logger.warning "Received Message - Type: #{inspect type} -- Message: #{inspect msg}"
+    Logger.warning("Received Message - Type: #{inspect(type)} -- Message: #{inspect(msg)}")
 
     {:ok, state}
   end
 
-  defp parse_current_btcusd_price! ticker_body do
+  defp parse_current_btcusd_price!(ticker_body) do
     [
       _bid,
       _bid_size,
@@ -90,23 +108,35 @@ defmodule MilkRun.Clients.Bitfinex do
     last_price
   end
 
-  defp manage_connection { :ok, pid } do
-    { :ok, pid }
+  defp manage_connection({:ok, pid}) do
+    {:ok, pid}
   end
 
-  defp manage_connection { :error, %WebSockex.RequestError{code: 503} } do
-    { :error, 1, "Bitfinex is down"}
+  defp manage_connection({:error, %WebSockex.RequestError{code: 503}}) do
+    {:error, 1, "Bitfinex is down"}
   end
 
-  defp manage_connection {:error, %WebSockex.ConnError{original: :timeout}} do
-    { :error, 2, "Bitfinex timeout"}
+  defp manage_connection({:error, %WebSockex.ConnError{original: :timeout}}) do
+    {:error, 2, "Bitfinex timeout"}
   end
 
-  defp manage_connection { :error, error } do
-    { :error, 255, "Bitfinex unknown error \n#{inspect error}"}
+  defp manage_connection({:error, error}) do
+    {:error, 255, "Bitfinex unknown error \n#{inspect(error)}"}
   end
 
-  defp get_price [_channel_id, _bid, _bid_size, _ask, _ask_size, _daily_change, _daily_change_perc, last_price, volume, high, low] do
+  defp get_price([
+         _channel_id,
+         _bid,
+         _bid_size,
+         _ask,
+         _ask_size,
+         _daily_change,
+         _daily_change_perc,
+         last_price,
+         volume,
+         high,
+         low
+       ]) do
     %{
       status: :ok,
       price: last_price,
@@ -116,32 +146,34 @@ defmodule MilkRun.Clients.Bitfinex do
     }
   end
 
-  defp get_price _ do
+  defp get_price(_) do
     %{
       status: :nothing
     }
   end
 
-  defp maybe_broadcast(%{ status: :ok } = data, topic, message) when is_float(data.price) do
-    formatted_price = :erlang.float_to_binary(data.price, [decimals: 0])
-    { int_price, _ } = Integer.parse(formatted_price)
+  defp maybe_broadcast(%{status: :ok} = data, topic, message) when is_float(data.price) do
+    formatted_price = :erlang.float_to_binary(data.price, decimals: 0)
+    {int_price, _} = Integer.parse(formatted_price)
 
     broadcast(int_price, topic, message)
   end
 
-  defp maybe_broadcast(%{ status: :ok } = data, topic, message) when is_integer(data.price) do
+  defp maybe_broadcast(%{status: :ok} = data, topic, message) when is_integer(data.price) do
     broadcast(data.price, topic, message)
   end
 
-  defp maybe_broadcast(%{ status: :nothing }, _, _) do
+  defp maybe_broadcast(%{status: :nothing}, _, _) do
     # do nothing... this looks like a keepalive feature not containing any price info
   end
 
-  defp maybe_broadcast data, _, _ do
-    Logger.warning("NOT broadcasting Bitfinex BTCUSD price because of incompatible format: #{inspect data}")
+  defp maybe_broadcast(data, _, _) do
+    Logger.warning(
+      "NOT broadcasting Bitfinex BTCUSD price because of incompatible format: #{inspect(data)}"
+    )
   end
 
-  defp broadcast price, topic, message do
+  defp broadcast(price, topic, message) do
     Cache.set_btcusd(price)
     Endpoint.broadcast(topic, message, price)
   end
