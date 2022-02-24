@@ -60,7 +60,7 @@ defmodule MilkRun.Clients.Bitfinex do
 
     subscription = %{
       event: "subscribe",
-      channel: "ticker",
+      channel: "trades",
       symbol: "tBTCUSD"
     }
 
@@ -124,25 +124,19 @@ defmodule MilkRun.Clients.Bitfinex do
     {:error, 255, "Bitfinex unknown error \n#{inspect(error)}"}
   end
 
-  defp get_price([
-         _channel_id,
-         _bid,
-         _bid_size,
-         _ask,
-         _ask_size,
-         _daily_change,
-         _daily_change_perc,
-         last_price,
-         volume,
-         high,
-         low
-       ]) do
+  ## trade execution
+  defp get_price([_, "te", _, _amount, price, _rate]) do
     %{
       status: :ok,
-      price: last_price,
-      high: high,
-      low: low,
-      volume: volume
+      price: price
+    }
+  end
+
+  ## trade update
+  defp get_price([_, "tu", _, _amount, _trade_id, price, _rate]) do
+    %{
+      status: :ok,
+      price: price
     }
   end
 
