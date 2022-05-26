@@ -37,8 +37,8 @@ defmodule MilkRun.Clients.Kraken do
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
 
-      {:error, reason} ->
-        {:error, reason}
+      _ ->
+        {:error, "unknown error"}
     end
   end
 
