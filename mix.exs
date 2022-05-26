@@ -4,7 +4,7 @@ defmodule MilkRun.MixProject do
   def project do
     [
       app: :milk_run,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:gettext] ++ Mix.compilers(),
