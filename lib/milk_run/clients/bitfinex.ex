@@ -56,7 +56,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_connect(_conn, state) do
-    Logger.info("Connected to bitfinex...")
+    Logger.info("Connected to Bitfinex")
 
     subscription = %{
       event: "subscribe",
@@ -72,7 +72,7 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.info("Subscribing...\n#{subscription_json}")
+    Logger.debug("Bitfinex subscribing... to \n#{subscription_json}")
 
     {:reply, {:text, subscription_json}, state}
   end
@@ -86,7 +86,9 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   def handle_frame({type, msg}, state) do
-    Logger.warning("Received Message - Type: #{inspect(type)} -- Message: #{inspect(msg)}")
+    Logger.warning(
+      "Received an unknown message - Type: #{inspect(type)} -- Message: #{inspect(msg)}"
+    )
 
     {:ok, state}
   end

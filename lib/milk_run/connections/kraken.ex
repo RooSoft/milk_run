@@ -15,16 +15,16 @@ defmodule MilkRun.Connections.Kraken do
 
   @impl true
   def init(state) do
-    Logger.info("#{DateTime.now!("Etc/UTC")}: Initializing kraken connection", ansi_color: :light_blue)
+    Logger.debug("Initializing kraken connection", ansi_color: :light_blue)
 
     Process.send(__MODULE__, {:start}, [])
 
-    { :ok, state }
+    {:ok, state}
   end
 
   @impl Connection
   def stop do
-    Logger.info("#{DateTime.now!("Etc/UTC")}: Manually stopping kraken connection", ansi_color: :light_blue)
+    Logger.debug("Manually stopping kraken connection", ansi_color: :light_blue)
 
     GenServer.stop(__MODULE__, :manual)
   end
@@ -36,43 +36,42 @@ defmodule MilkRun.Connections.Kraken do
 
   @impl true
   def handle_info({:start}, state) do
-    Logger.info "#{DateTime.now!("Etc/UTC")}: Starting kraken connection", ansi_color: :light_blue
+    Logger.debug("Starting kraken connection", ansi_color: :light_blue)
 
     {
       :noreply,
-      MilkRun.Clients.Kraken.start
+      MilkRun.Clients.Kraken.start()
       |> manage_connection(state)
     }
   end
 
   @impl true
-  def handle_info({ :DOWN, ref, :process, pid, reason}, state) do
-    Logger.warn "#{inspect pid} #{inspect ref} is down because: #{inspect reason}"
-    Logger.warn "Will restart kraken in #{@restart_delay/1000}s"
+  def handle_info({:DOWN, ref, :process, pid, reason}, state) do
+    Logger.warn("#{inspect(pid)} #{inspect(ref)} is down because: #{inspect(reason)}")
+    Logger.warn("Will restart kraken in #{@restart_delay / 1000}s")
 
     # try to restart the service after a given delay
     Process.send_after(self(), :start, @restart_delay)
 
-    { :noreply, %{ state | state: :down } }
+    {:noreply, %{state | state: :down}}
   end
 
   @impl true
-  def handle_call({:get_state},  _from, state) do
-    { :reply, state.state, state }
+  def handle_call({:get_state}, _from, state) do
+    {:reply, state.state, state}
   end
 
-
-  defp manage_connection { :ok, pid }, state do
-    Logger.info "#{DateTime.now!("Etc/UTC")}: Kraken started: #{inspect pid}", ansi_color: :light_blue
+  defp manage_connection({:ok, pid}, state) do
+    Logger.debug("Kraken started: #{inspect(pid)}", ansi_color: :light_blue)
 
     Process.monitor(pid)
 
-    %{ state | state: :up }
+    %{state | state: :up}
   end
 
-  defp manage_connection { :error, code, message }, state do
-    Logger.warn "Kraken issued an error #{code} on startup : #{message}"
+  defp manage_connection({:error, code, message}, state) do
+    Logger.error("Kraken issued an error #{code} on startup : #{message}")
 
-    %{ state | state: :down }
+    %{state | state: :down}
   end
 end

@@ -43,7 +43,7 @@ defmodule MilkRun.Clients.Kraken do
   end
 
   def handle_connect(_conn, state) do
-    Logger.info("Connected to kraken...")
+    Logger.debug("Connected to kraken...")
 
     subscription =
       Jason.encode!(%{
@@ -60,7 +60,7 @@ defmodule MilkRun.Clients.Kraken do
   end
 
   def handle_cast({:send_message, subscription_json}, state) do
-    Logger.info("Subscribing to Kraken...")
+    Logger.debug("Subscribing to Kraken...")
 
     {:reply, {:text, subscription_json}, state}
   end
@@ -119,7 +119,7 @@ defmodule MilkRun.Clients.Kraken do
          "status" => "subscribed",
          "subscription" => %{"name" => "trade"}
        }) do
-    Logger.info("Successfully connected to Kraken XBT/CAD trades websocket")
+    Logger.info("Connected to Kraken XBT/CAD trades websocket")
   end
 
   defp process(%{
@@ -128,7 +128,7 @@ defmodule MilkRun.Clients.Kraken do
          "status" => "online",
          "version" => _version
        }) do
-    Logger.info("Kraken is online")
+    Logger.debug("Kraken is online")
   end
 
   defp process(message) do
