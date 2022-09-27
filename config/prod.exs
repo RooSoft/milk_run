@@ -14,7 +14,10 @@ config :milk_run, MilkRunWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, :console,
+  level: :info,
+  format: "$metadata[$level] $message\n",
+  metadata: [:request_id, :client_ip]
 
 # ## SSL Support
 #
