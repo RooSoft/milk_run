@@ -35,7 +35,7 @@ defmodule MilkRunWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug Plug.RequestId
-  plug MilkRunWeb.Plugs.ClientIp
+  plug MilkRunWeb.Plugs.SetLoggerMetadata
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
@@ -46,5 +46,8 @@ defmodule MilkRunWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  plug Logster.Plugs.Logger
+
   plug MilkRunWeb.Router
 end

@@ -17,7 +17,7 @@ config :milk_run, MilkRunWeb.Endpoint,
 config :logger, :console,
   level: :info,
   format: "$metadata[$level] $message\n",
-  metadata: [:request_id, :client_ip]
+  metadata: [:remote_ip, :request_id]
 
 # ## SSL Support
 #
@@ -52,3 +52,7 @@ config :logger, :console,
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
+
+config :phoenix, :logger, false
+
+config :logster, :allowed_headers, ["X-Forwarded-For"]

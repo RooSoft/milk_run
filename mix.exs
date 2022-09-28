@@ -5,7 +5,7 @@ defmodule MilkRun.MixProject do
     [
       app: :milk_run,
       version: "0.2.2",
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -49,7 +49,8 @@ defmodule MilkRun.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:websockex, "~> 0.4.3"},
-      {:httpoison, "~> 1.8"}
+      {:httpoison, "~> 1.8"},
+      {:logster, "~> 1.0"}
     ]
   end
 
