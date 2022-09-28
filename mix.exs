@@ -50,7 +50,8 @@ defmodule MilkRun.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:websockex, "~> 0.4.3"},
       {:httpoison, "~> 1.8"},
-      {:logster, "~> 1.0"}
+      {:logster, "~> 1.0"},
+      {:remote_ip, "~> 1.0"}
     ]
   end
 

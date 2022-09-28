@@ -35,6 +35,7 @@ defmodule MilkRunWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug Plug.RequestId
+  plug RemoteIp
   plug MilkRunWeb.Plugs.SetLoggerMetadata
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
