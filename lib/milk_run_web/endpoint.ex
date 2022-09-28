@@ -12,6 +12,8 @@ defmodule MilkRunWeb.Endpoint do
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
+  plug RemoteIp
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest
@@ -35,7 +37,6 @@ defmodule MilkRunWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug Plug.RequestId
-  plug RemoteIp
   plug MilkRunWeb.Plugs.SetLoggerMetadata
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
