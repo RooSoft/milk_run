@@ -12,6 +12,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 ## Production build
 
 ```bash
+MIX_ENV=prod mix assets.deploy
 MIX_ENV=prod mix release
 scp _build/prod/milk_run-0.x.0.tar.gz milkrun@prod-server:.
 ```
