@@ -57,6 +57,14 @@ defmodule MilkRun.Connections.Kraken do
   end
 
   @impl true
+  def handle_info(catch_all, state) do
+    IO.puts "Kraken catch all below --------------"
+    IO.inspect(catch_all)
+
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_call({:get_state}, _from, state) do
     {:reply, state.state, state}
   end
