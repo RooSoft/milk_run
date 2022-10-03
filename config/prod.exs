@@ -16,7 +16,7 @@ config :milk_run, MilkRunWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, :console,
   level: :info,
-  format: "$metadata[$level] $message\n",
+  format: "[$level] $metadata$message\n",
   metadata: [:remote_ip, :request_id]
 
 # ## SSL Support
