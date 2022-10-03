@@ -52,6 +52,13 @@ defmodule MilkRunWeb.Live.IndexLive do
      |> update_btccad(int_value)}
   end
 
+  @impl true
+  def handle_info(catch_all, socket) do
+    Logger.error("CATCH ALL: #{inspect(catch_all)}")
+
+    {:noreply, socket}
+  end
+
   def get_current_values(socket) do
     socket
     |> assign(:btcusd, MilkRun.Cache.get_btcusd())
