@@ -23,7 +23,7 @@ defmodule MilkRunWeb.Live.IndexLive do
   @impl true
   def handle_info(%{topic: @bitfinex_topic, event: @btcusd_message, payload: value}, socket)
       when is_float(value) do
-    Logger.info("Got a bitfinex float #{value}")
+    Logger.debug("Got a bitfinex float #{value}")
 
     int_value = Math.float_to_int(value)
 
@@ -43,7 +43,7 @@ defmodule MilkRunWeb.Live.IndexLive do
   @impl true
   def handle_info(%{topic: @kraken_topic, event: @btccad_message, payload: value}, socket)
       when is_float(value) do
-    Logger.info("Got a kraken float #{value}")
+    Logger.debug("Got a kraken float #{value}")
 
     int_value = Math.float_to_int(value)
 
