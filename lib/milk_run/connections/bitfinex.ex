@@ -51,7 +51,7 @@ defmodule MilkRun.Connections.Bitfinex do
     Logger.warn("Will restart bitfinex in #{@restart_delay / 1000}s")
 
     # try to restart the service after a given delay
-    Process.send_after(self(), :start, @restart_delay)
+    Process.send_after(self(), {:start}, @restart_delay)
 
     {:noreply, %{state | state: :down}}
   end
