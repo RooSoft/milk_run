@@ -2,6 +2,7 @@ defmodule MilkRun.Clients.Kraken do
   use WebSockex
   require Logger
 
+  alias MilkRun.Math
   alias MilkRun.Cache
   alias MilkRunWeb.Endpoint
 
@@ -80,9 +81,12 @@ defmodule MilkRun.Clients.Kraken do
       }
     } = Jason.decode!(ticker_body)
 
-    {price, _} = price_string |> Float.parse()
+    {price, _} =
+      price_string
+      |> Float.parse()
 
     price
+    |> Math.float_to_int()
   end
 
   defp manage_connection({:ok, pid}) do
