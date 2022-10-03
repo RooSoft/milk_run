@@ -63,7 +63,7 @@ config :milk_run, MilkRunWeb.Endpoint,
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console,
-  format: "$metadata[$level] $message\n",
+  format: "[$level] $metadata$message\n",
   metadata: [:remote_ip, :request_id]
 
 # Set a higher stacktrace during development. Avoid configuring such
