@@ -53,6 +53,14 @@ defmodule MilkRunWeb.Live.IndexLive do
   end
 
   @impl true
+  def handle_info(%{topic: @kraken_topic, event: @btccad_message, payload: value}, socket)
+      when is_integer(value) do
+    {:noreply,
+     socket
+     |> update_btccad(value)}
+  end
+
+  @impl true
   def handle_info(catch_all, socket) do
     Logger.error("CATCH ALL: #{inspect(catch_all)}")
 
