@@ -85,6 +85,7 @@ defmodule MilkRunWeb.Live.IndexLive do
   defp update_btcusd(socket, value) do
     socket
     |> assign(:btcusd, value)
+    |> assign(:page_title, "#{value} - MilkRun")
   end
 
   defp update_btccad(socket, value) do
