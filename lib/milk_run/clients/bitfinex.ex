@@ -123,6 +123,11 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   defp manage_connection({:error, error}) do
+    #### TODO: app crashes when error == %WebSockex.RequestError{code: 408, message: "Request Time-out"}
+    ####       maybe introduce a retry mechanism with a timeout
+    ####       :timer.sleep(60000)
+    ####       {:stop, {:shutdown, message}}  ## would work with a gen server
+    ####       the solution may be to switch to mint websockets just like in roosoft/nostr
     {:error, 255, "Bitfinex unknown error \n#{inspect(error)}"}
   end
 
