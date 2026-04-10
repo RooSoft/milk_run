@@ -22,7 +22,7 @@ defmodule MilkRunWeb do
       use Phoenix.Controller, namespace: MilkRunWeb
 
       import Plug.Conn
-      import MilkRunWeb.Gettext
+      use Gettext, backend: MilkRunWeb.Gettext
       alias MilkRunWeb.Router.Helpers, as: Routes
     end
   end
@@ -72,7 +72,7 @@ defmodule MilkRunWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import MilkRunWeb.Gettext
+      use Gettext, backend: MilkRunWeb.Gettext
     end
   end
 
@@ -89,7 +89,7 @@ defmodule MilkRunWeb do
       import Phoenix.View
 
       import MilkRunWeb.ErrorHelpers
-      import MilkRunWeb.Gettext
+      use Gettext, backend: MilkRunWeb.Gettext
       alias MilkRunWeb.Router.Helpers, as: Routes
     end
   end

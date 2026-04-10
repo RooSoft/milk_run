@@ -47,8 +47,8 @@ defmodule MilkRun.Connections.Bitfinex do
 
   @impl true
   def handle_info({:DOWN, ref, :process, pid, reason}, state) do
-    Logger.warn("#{inspect(pid)} #{inspect(ref)} is down because: #{inspect(reason)}")
-    Logger.warn("Will restart bitfinex in #{@restart_delay / 1000}s")
+    Logger.warning("#{inspect(pid)} #{inspect(ref)} is down because: #{inspect(reason)}")
+    Logger.warning("Will restart bitfinex in #{@restart_delay / 1000}s")
 
     # try to restart the service after a given delay
     Process.send_after(self(), {:start}, @restart_delay)
