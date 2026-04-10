@@ -94,20 +94,10 @@ defmodule MilkRun.Clients.Bitfinex do
   end
 
   defp parse_current_btcusd_price!(ticker_body) do
-    [
-      _bid,
-      _bid_size,
-      _ask,
-      _ask_size,
-      _daily_change,
-      _daily_change_relative,
-      last_price,
-      _volume,
-      _high,
-      _low
-    ] = Jason.decode!(ticker_body)
-
-    last_price
+    case Jason.decode!(ticker_body) do
+      [_bid, _bid_size, _ask, _ask_size, _daily_change, _daily_change_relative, last_price, _volume, _high, _low | _rest] ->
+        last_price
+    end
   end
 
   defp manage_connection({:ok, pid}) do
